@@ -6,7 +6,8 @@ var Viamagus_Website_Loader =  {
     _twitterLastPublishId:'',
     _ecomProductList:[],
 	_init : function(options){
-		this._sendSupportEmail();
+		// Contact form disabled: inquiries via email only — _sendSupportEmail() not called
+		// this._sendSupportEmail();
 		this._enableLazyloadImages({siteBuilder:false});
 		this._loadBlogPosts({siteBuilder:false});  
 	    this._loadGallery();
@@ -762,7 +763,8 @@ var Viamagus_Website_Loader =  {
 				defaultZoom = Math.floor($(e).find('.viamagus-google-mapzoom').val());
 			}
 			
-			 var contentString = '<div id="infoWindowContent"> '+$(e).find('.viamagus-google-address').text()+'  </div>'
+			var addressEl = $(e).find('.viamagus-google-address');
+			var contentString = '<div id="infoWindowContent">' + (addressEl.length ? addressEl.html() : '') + '</div>';
 			  var infowindow = new google.maps.InfoWindow({
 				  content: contentString,
 				   maxWidth: 300
@@ -781,14 +783,25 @@ var Viamagus_Website_Loader =  {
             if($(e).attr("data-google-map-style")!=""){
 			  mapstyle=googleMapStyles[$(e).attr("data-google-map-style")];
 			}
+			var centerLatLng = latLng;
+			var centerJson = $(e).find('.viamagus-google-map-center').html();
+			if(centerJson && $.trim(centerJson)!=""){
+				centerJson = JSON.parse($.trim(centerJson));
+				var centerKeys = [];
+				for (var centerKey in centerJson) {
+				   centerKeys.push(centerKey);
+				}
+				centerLatLng = new google.maps.LatLng(parseFloat(centerJson[centerKeys[0]]),parseFloat(centerJson[centerKeys[1]]));
+			}
 			var map = new google.maps.Map($(e).find('.viamagus-google-map-canvas')[0], {
 					zoom: defaultZoom,
-					center: latLng,
+					center: centerLatLng,
                     styles:mapstyle,scrollwheel:false
 				 });
 			var marker = new google.maps.Marker({
                 position: latLng,
-                map: map
+                map: map,
+				title: 'Aadgad remedies India Pvt. Ltd'
             });
 			
 			google.maps.event.addListener(marker, 'click', function() {
@@ -813,6 +826,8 @@ var Viamagus_Website_Loader =  {
 		 }
 	
 	},_sendSupportEmail:function(){
+	  // Contact form disabled: inquiries via email only
+	  return;
 	  $('.form-horizontal')
 					.each(
 							function(index, e) {
